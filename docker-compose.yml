@@ -1,0 +1,33 @@
+services:
+
+  mongo:
+    image: mongo:4.4
+    container_name: realworld-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - realworld-network
+
+  app:
+    build: .
+    container_name: realworld-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/conduit
+      - PORT=3000
+      - SECRET=conduit-super-secret-key
+    depends_on:
+      - mongo
+    networks:
+      - realworld-network
+    command: sh -c "sleep 5 && node app.js"
+
+volumes:
+  mongo-data:
+
+networks:
+  realworld-network:
