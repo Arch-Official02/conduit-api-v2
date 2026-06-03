@@ -50,14 +50,23 @@ pipeline {
                 bat "docker tag %ECR_REGISTRY%/%ECR_REPOSITORY%:%IMAGE_TAG% %ECR_REGISTRY%/%ECR_REPOSITORY%:latest"
             }
         }
-        stage('Debug AWS') {
-            steps {
-                bat '''
-                aws --version
-                aws sts get-caller-identity
-                '''
+
+        stage('Verify AWS Credentials') {
+           steps {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    bat '''
+                    echo AWS key exists: %AWS_ACCESS_KEY_ID%
+                    aws sts get-caller-identity
+                    '''
+                }
             }
         }
+
+
+        
         stage('Push to ECR') {
             steps {
                 withCredentials([
