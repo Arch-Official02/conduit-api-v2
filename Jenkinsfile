@@ -50,7 +50,14 @@ pipeline {
                 bat "docker tag %ECR_REGISTRY%/%ECR_REPOSITORY%:%IMAGE_TAG% %ECR_REGISTRY%/%ECR_REPOSITORY%:latest"
             }
         }
-
+        stage('Debug AWS') {
+            steps {
+                bat '''
+                aws --version
+                aws sts get-caller-identity
+                '''
+            }
+        }
         stage('Push to ECR') {
             steps {
                 withCredentials([
